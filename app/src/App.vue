@@ -8,75 +8,26 @@
             v-model="courseToAdd"
             clearable
             label="Add Course Code"
-            append-outer-icon="add"
+            append-outer-icon="mdi-plus"
             @click:append-outer="addCourse"
+            @keyup.enter="addCourse"
           ></v-text-field>
 
           <v-list v-if="courses.length > 0">
             <v-list-item-group v-model="selectedIndex">
-              <v-list-item
-                @click="selectedIndex = index"
-                v-for="(course, index) in courses"
+              <course-list-item
+                v-for="course in courses"
                 :key="course"
-              >
-                <v-list-item-content>
-                  <v-list-item-title>{{course.code}}</v-list-item-title>
-                </v-list-item-content>
-
-                <v-list-item-content>
-                  <v-list-item-title>Mark: {{course.mark}}%</v-list-item-title>
-                </v-list-item-content>
-
-                <v-list-item-content>
-                  <v-list-item-title>Exam Date: {{course.examDate}}</v-list-item-title>
-                </v-list-item-content>
-
-                <v-list-item-content>
-                  <v-list-item-action v-on:click="removeCourse(index)">
-                    <v-icon v-if="index != courseToDeleteIndex">delete</v-icon>
-                    <v-btn v-if="index === courseToDeleteIndex">Sure?</v-btn>
-                  </v-list-item-action>
-                </v-list-item-content>
-              </v-list-item>
+                :courseName="course.code"
+                :courseMark="course.mark"
+                :courseExamDate="course.examDate"
+                @click="selectedIndex = index"
+              />
             </v-list-item-group>
           </v-list>
-          <!-- <v-list v-if="courses.length > 0">
-            <v-list-tile
-              @click="selectedIndex = index"
-              v-for="(course, index) in courses"
-              :key="course"
-            >
-              <v-list-tile-content>{{course.code}}</v-list-tile-content>
-              <v-list-tile-content>Mark: {{course.mark}}%</v-list-tile-content>
-              <v-list-tile-content>Exam Date: {{course.examDate}}</v-list-tile-content>
-              <v-list-tile-action v-on:click="removeCourse(index)">
-                <v-icon v-if="index != courseToDeleteIndex">delete</v-icon>
-                <v-btn v-if="index === courseToDeleteIndex">Sure?</v-btn>
-              </v-list-tile-action>
-            </v-list-tile>
-          </v-list>-->
+
           <div v-if="selectedIndex >= 0" class="mt-4">
-            <span class="display-1">
-              Manage {{courses[selectedIndex].code}}
-              <v-btn flat icon @click="selectedIndex=-1">
-                <v-icon>check</v-icon>
-              </v-btn>
-            </span>
-            <div class="row">
-              <!--             <v-btn raised><v-icon left>computer</v-icon>Add Assignment</v-btn> -->
-              <p class="title">Mark:</p>
-              <v-slider
-                class="ml-4"
-                v-model="courses[selectedIndex].mark"
-                persistent-hint
-                thumb-label="always"
-              ></v-slider>
-            </div>
-            <div>
-              <!--             <v-btn raised><v-icon left>computer</v-icon>Add Assignment</v-btn> -->
-              <p class="title">Exam Date:</p>
-              <v-date-picker v-model="courses[selectedIndex].examDate" landscape="true"></v-date-picker>
-            </div>
+            <manage-course :course="courses[selectedIndex]" />
           </div>
         </v-container>
       </v-content>
@@ -85,8 +36,15 @@
 </template>
 
 <script>
+import CourseListItem from "./components/CourseListItem";
+import ManageCourse from "./components/ManageCourse";
+
 export default {
   name: "App",
+  components: {
+    CourseListItem,
+    ManageCourse
+  },
   data() {
     return {
       courseToDeleteIndex: -1,
